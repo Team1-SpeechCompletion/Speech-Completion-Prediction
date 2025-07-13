@@ -11,7 +11,7 @@ This repository contains code for preprocessing and evaluating speech completion
 ```bash
 git clone https://github.com/Team1-SpeechCompletion/Speech-Completion-Prediction.git
 cd Speech-Completion-Prediction/method1_janojit
-````
+```
 
 ---
 
@@ -72,7 +72,22 @@ python split_dataset.py
 
 ---
 
-### 7. Preprocess the Completion Data
+### 7. Download GloVe Embeddings
+
+Before preprocessing, download the GloVe 300-dimensional word embeddings from [GloVe Website](https://nlp.stanford.edu/projects/glove/), specifically:
+
+* `glove.6B.300d.txt`
+
+Place the file in the root of the `method1_janojit/` directory:
+
+```bash
+# Example
+mv glove.6B.300d.txt method1_janojit/
+```
+
+---
+
+### 8. Preprocess the Completion Data
 
 Run the preprocessing script:
 
@@ -82,7 +97,7 @@ python preprocess_completion_data.py
 
 ---
 
-### 8. Evaluate the Model
+### 9. Evaluate the Model
 
 Finally, run the evaluation script:
 
@@ -101,6 +116,7 @@ method1_janojit/
 ├── preprocess_completion_data.py
 ├── evaluation.py
 ├── requirements.txt
+├── glove.6B.300d.txt
 ├── transcripts/
 │   └── *.txt
 └── ...
@@ -112,6 +128,7 @@ method1_janojit/
 
 * Ensure all transcript files are in `.txt` format.
 * The scripts assume the presence of the `transcripts/` folder in the same directory.
+* The GloVe file (`glove.6B.300d.txt`) is required for preprocessing.
 * Modify any script as needed to fit your custom dataset or settings.
 
 ---

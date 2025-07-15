@@ -1,0 +1,2 @@
+## 📁 Backend Folder Structure
+<pre> ```text backend_ngrok/ ├── app.py ├── BiGRUTextNet_GloVe.py ├── completion_model.py ├── FineTuned_Gemma2B.py ├── glove.6B.300d.txt ├── inference_with_boosting.py ├── Is_Unique_Keyword.py ├── keyword_generator.py ├── knowledge_graph.py ├── main_script.py ├── model_completion.py ├── requirements.txt ├── summariser.py ├── gemma-2b-finetuned/ ├── models/ │ └── BiGRUTextNet_GloVe.pt ``` </pre>

@@ -10,6 +10,6 @@ It includes:
 - 📊 Real-time convergence tracking using keyword and entity metrics
 
 This comprises two repositories
--backend
--frontend
+- backend
+- frontend
 The instructions to execute these are present within the README files in the respective folders

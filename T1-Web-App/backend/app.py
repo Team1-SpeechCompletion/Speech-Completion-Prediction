@@ -14,10 +14,15 @@ def analyze_route():
 @app.route('/reset', methods=['POST'])
 def reset_route():
     return reset()
-
+    
+'''Uncomment while using ngrok
 # 🔗 Open the tunnel
 public_url = ngrok.connect(5000)
 print(f"🔗 Backend is live at: {public_url}")
 
 # 🚀 Start the server
 app.run(port=5000)
+'''
+# Comment the code below if using ngrok
+if __name__ == '__main__':
+    app.run(debug=True)

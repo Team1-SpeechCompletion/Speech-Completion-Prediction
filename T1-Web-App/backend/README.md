@@ -37,7 +37,8 @@ Please download the following required files and place them **exactly as describ
 - **Folder:**`gemma-2b-finetuned`
 - **Place in:** `./backend`
 
-##Setup
+
+## Setup
 First, navigate to the `backend` directory and set up a virtual environment:
 
 ```bash
@@ -46,13 +47,13 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-##Install dependencies
+## Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-##Running server (without ngrok)
+## Running server (without ngrok)
 
 ```bash
 python app.py
@@ -60,4 +61,17 @@ python app.py
 
 You shall find the server running on `http://127.0.0.1:5000`
 
+## Running server (using ngrok)
+
+Add the following lines of code to the flask file app.py
+```bash
+# Open the tunnel
+public_url = ngrok.connect(5000)
+print(f"🔗 Backend is live at: {public_url}")
+
+# Start the server
+app.run(port=5000)
+```
+You will find the terminal showing a URL `https://ngrok_your_url`
+Put the same in the react file App.js in the folder `frontend`
 

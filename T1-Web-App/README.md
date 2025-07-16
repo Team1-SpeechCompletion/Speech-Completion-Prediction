@@ -1,4 +1,4 @@
-# 🧠 Semantic Completion Meter — Backend & Frontend
+# 🧠 Speech Completion Prediction Web-App — Backend & Frontend
 
 
 ## Members:

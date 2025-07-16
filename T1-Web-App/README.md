@@ -1,5 +1,12 @@
 # 🧠 Semantic Completion Meter — Backend & Frontend
 
+
+## Members:
+- Janojit chakrobarty
+- Jahar Kumar Paul
+- Subhradip Bhattacharya
+- Kinshuk Ganguly
+
 This project implements a system to **estimate semantic completion percentage** of lecture-style input text using two intelligent backends:
 - A **supervised BiGRU model** trained on GloVe embeddings
 - A **Generative LLM (Gemma 2B)** fine-tuned on structured instructional data

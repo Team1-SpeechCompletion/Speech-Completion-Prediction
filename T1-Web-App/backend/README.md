@@ -1,4 +1,4 @@
-## 📁 Backend Folder Structure
+## Backend Folder Structure
 ```text
 backend/
 ├── app.py
@@ -19,11 +19,11 @@ backend/
 │   └── BiGRUTextNet_GloVe.pt
 ```
 
-## 📥 Downloads
+## Downloads
 
 Please download the following required files and place them **exactly as described**:
 
-**Link:** [Download]([https://drive.google.com/your_bigru_link](https://drive.google.com/drive/folders/1-PYsdyYRI51MYOMejVIsX0Cya-kyV0XK?usp=sharing))
+**Link:** [Download] ([https://drive.google.com/your_bigru_link](https://drive.google.com/drive/folders/1-PYsdyYRI51MYOMejVIsX0Cya-kyV0XK?usp=sharing)
 
 ### 1. GloVe Embeddings
 - **File:** `glove.6B.300d.txt`

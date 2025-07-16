@@ -17,6 +17,7 @@ backend/
 ├── gemma-2b-finetuned/
 ├── models/
 │   └── BiGRUTextNet_GloVe.pt
+```
 
 ## 📥 Downloads
 

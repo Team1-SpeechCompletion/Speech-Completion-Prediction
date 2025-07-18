@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
 import * as d3 from 'd3';
 
-//Ngrok URL
-const BACKEND_URL = 'https://2aa35a52bbd0.ngrok-free.app/'; // Update this if ngrok restarts
-//const BACKEND_URL ='http://127.0.0.1:5000';
+//const BACKEND_URL = 'http://127.0.0.1:5000';
+const BACKEND_URL = 'https://eb907b17cbb4.ngrok-free.app/';
 
 function App() {
   const [text, setText] = useState('');
@@ -13,12 +13,13 @@ function App() {
     chunkNumbers: [],
     cumulativeKeywords: [],
     kdr: [],
-    randomValues: [],
+    pctChunk: [],
     entityDiscovery: [],
     convergenceChunk: null
   });
 
-  // Reset backend state on first load
+  const chunkScrollRef = useRef(); 
+
   useEffect(() => {
     const resetBackend = async () => {
       try {
@@ -57,12 +58,12 @@ function App() {
         chunkNumbers: [],
         cumulativeKeywords: [],
         kdr: [],
-        randomValues: [],
+        pctChunk: [],
         entityDiscovery: [],
         convergenceChunk: null
       });
     } catch (err) {
-      console.error(" Failed to reset backend:", err);
+      console.error("Failed to reset backend:", err);
     }
   };
 
@@ -72,7 +73,6 @@ function App() {
       const json = await res.json();
       if (json.status === "reset") {
         console.log("Reset successful");
-
         setText('');
         setChunks([]);
         setCurrentIndex(0);
@@ -80,13 +80,13 @@ function App() {
           chunkNumbers: [],
           cumulativeKeywords: [],
           kdr: [],
-          randomValues: [],
+          pctChunk: [],
           entityDiscovery: [],
           convergenceChunk: null
         });
       }
     } catch (err) {
-      console.error(" Error resetting:", err);
+      console.error("Error resetting:", err);
     }
   };
 
@@ -104,20 +104,31 @@ function App() {
           });
 
           const data = await response.json();
-          console.log(` Chunk ${data.chunk} sent | Words: ${chunk.split(/\s+/).length}`);
+          console.log(`Chunk ${data.chunk} sent | Words: ${chunk.split(/\s+/).length}`);
 
-          setResults((prev) => ({
-            chunkNumbers: [...prev.chunkNumbers, data.chunk],
-            cumulativeKeywords: [...prev.cumulativeKeywords, data.cumulative_keywords],
-            kdr: [...prev.kdr, data.kdr],
-            randomValues: [...prev.randomValues, data.random_value],
-            entityDiscovery: [...prev.entityDiscovery, data.entity_relation_discovery],
-            convergenceChunk: data.convergence_chunk ?? prev.convergenceChunk
-          }));
+          setResults((prev) => {
+            const updated = {
+              chunkNumbers: [...prev.chunkNumbers, data.chunk],
+              cumulativeKeywords: [...prev.cumulativeKeywords, data.cumulative_keywords],
+              kdr: [...prev.kdr, data.kdr],
+              pctChunk: [...prev.pctChunk, data.random_value],
+              entityDiscovery: [...prev.entityDiscovery, data.entity_relation_discovery],
+              convergenceChunk: data.convergence_chunk ?? prev.convergenceChunk
+            };
+
+            //Auto-scroll to bottom of list
+            setTimeout(() => {
+              if (chunkScrollRef.current) {
+                chunkScrollRef.current.scrollTop = chunkScrollRef.current.scrollHeight;
+              }
+            }, 100);
+
+            return updated;
+          });
 
           setCurrentIndex((prev) => prev + 1);
         } catch (err) {
-          console.error(" Chunk failed to send:", err);
+          console.error("Chunk failed to send:", err);
         }
       };
 
@@ -126,78 +137,100 @@ function App() {
   }, [chunks, currentIndex]);
 
   return (
-    <div style={{ display: 'flex', padding: 20 }}>
-      {/* LEFT: Input */}
-      <div style={{ flex: 1, paddingRight: 20 }}>
-        <h1>Speech Completion Estimation</h1>
+    <div className="app-container">
+      {/* LEFT PANEL */}
+      <div className="left-panel">
+        <h1>T1-Speech Completion Estimation</h1>
         <textarea
           rows="10"
-          cols="60"
+          cols="80"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Paste your text here"
         />
         <br />
-        <button onClick={handleSubmit}>Analyze</button>
-        <button onClick={handleReset} style={{ marginLeft: '10px' }}>Reset</button>
+        <button onClick={handleSubmit}>ANALYZE</button>
+        <button onClick={handleReset} className="reset-button">RESET</button>
 
         {results.chunkNumbers.length > 0 && (
           <>
-            <p><strong>Convergence occurs at chunk:</strong> {results.convergenceChunk ?? 'Not yet'}</p>
-            <h3>Chunk-wise Estimated Percentage Completions</h3>
-            <ul>
-              {results.randomValues.map((val, i) => (
-                <li key={i}>Chunk {i + 1}: {val}</li>
-              ))}
-            </ul>
+            <p>
+              <strong>ESTIMATED CONVERGENCE AT CHUNK:</strong>{' '}
+              {results.convergenceChunk ?? 'Not yet'}
+            </p>
+            <h3>CHUNK-WISE ESTIMATED PERCENTAGE COMPLETION</h3>
+
+            <div className="chunk-scroll" ref={chunkScrollRef}>
+              <ul>
+                {results.pctChunk.map((val, i) => (
+                  <li key={i}>
+                    CHUNK {i + 1} ----- {val.toFixed(2)}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </>
         )}
       </div>
 
-      {/* RIGHT: Charts */}
-      <div style={{ flex: 2 }}>
-        {results.chunkNumbers.length > 0 && (
-          <>
-            <D3Chart
-              title="Cumulative Unique Keywords"
-              x={results.chunkNumbers}
-              y={results.cumulativeKeywords}
-              xLabel="Chunk"
-              yLabel="Cumulative Unique Keywords"
-            />
-            <D3Chart
-              title="Keyword Discovery Rate (KDR)"
-              x={results.chunkNumbers}
-              y={results.kdr}
-              xLabel="Chunk"
-              yLabel="KDR"
-              threshold={0.02}
-              convergence={results.convergenceChunk}
-            />
-            <D3Chart
-              title="Entity-Relation Discovery"
-              x={results.chunkNumbers}
-              y={results.entityDiscovery}
-              xLabel="Chunk"
-              yLabel="Entity-Relation Count"
-            />
-          </>
-        )}
+      {/* RIGHT PANEL */}
+      <div className="right-panel-container">
+        <h2 className="right-panel-title">Analysis Charts</h2>
+        <div className="right-panel">
+          {results.chunkNumbers.length > 0 && (
+            <div className="chart-grid">
+              <div className="chart-box">
+                <D3Chart
+                  title="Cumulative Unique Keywords"
+                  x={results.chunkNumbers}
+                  y={results.cumulativeKeywords}
+                  xLabel="Chunk"
+                  yLabel="Cumulative Unique Keywords"
+                />
+              </div>
+
+              <div className="chart-box">
+                <D3Chart
+                  title="Keyword Discovery Rate (KDR)"
+                  x={results.chunkNumbers}
+                  y={results.kdr}
+                  xLabel="Chunk"
+                  yLabel="KDR"
+                  threshold={0.02}
+                  convergence={results.convergenceChunk}
+                />
+              </div>
+
+              <div className="chart-box">
+                <D3Chart
+                  title="Entity-Relation Discovery"
+                  x={results.chunkNumbers}
+                  y={results.entityDiscovery}
+                  xLabel="Chunk"
+                  yLabel="Entity-Relation Count"
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
+
 function D3Chart({ title, x, y, xLabel, yLabel, threshold, convergence }) {
   const ref = useRef();
 
   useEffect(() => {
-    const svg = d3.select(ref.current);
+    const svgEl = ref.current;
+    const svg = d3.select(svgEl);
     svg.selectAll('*').remove();
 
-    const width = 600;
-    const height = 300;
-    const margin = { top: 20, right: 40, bottom: 40, left: 60 };
+    const container = svgEl.parentElement;
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    const margin = { top: 30, right: 50, bottom: 50, left: 60 };
 
     const xScale = d3.scaleLinear()
       .domain([d3.min(x), d3.max(x)])
@@ -209,23 +242,22 @@ function D3Chart({ title, x, y, xLabel, yLabel, threshold, convergence }) {
 
     svg.append("g")
       .attr("transform", `translate(0, ${height - margin.bottom})`)
-      .call(d3.axisBottom(xScale).ticks(8).tickFormat(d3.format("d")));
+      .call(d3.axisBottom(xScale).ticks(Math.min(x.length, 8)).tickFormat(d3.format("d")));
 
     svg.append("g")
       .attr("transform", `translate(${margin.left}, 0)`)
       .call(d3.axisLeft(yScale).ticks(6));
-
-    const line = d3.line()
-      .x((_, i) => xScale(x[i]))
-      .y((_, i) => yScale(y[i]))
-      .curve(d3.curveMonotoneX);
 
     svg.append("path")
       .datum(y)
       .attr("fill", "none")
       .attr("stroke", "#0077cc")
       .attr("stroke-width", 2)
-      .attr("d", line);
+      .attr("d", d3.line()
+        .x((_, i) => xScale(x[i]))
+        .y((_, i) => yScale(y[i]))
+        .curve(d3.curveMonotoneX)
+      );
 
     svg.selectAll("circle")
       .data(y)
@@ -258,7 +290,15 @@ function D3Chart({ title, x, y, xLabel, yLabel, threshold, convergence }) {
 
     svg.append("text")
       .attr("x", width / 2)
-      .attr("y", height - 5)
+      .attr("y", margin.top - 10)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "14px")
+      .attr("font-weight", "bold")
+      .text(title);
+
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 10)
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
       .text(xLabel);
@@ -270,17 +310,22 @@ function D3Chart({ title, x, y, xLabel, yLabel, threshold, convergence }) {
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
       .text(yLabel);
-
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", 15)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "14px")
-      .attr("font-weight", "bold")
-      .text(title);
   }, [x, y, xLabel, yLabel, title, threshold, convergence]);
 
-  return <svg ref={ref} width={600} height={300} />;
+  return (
+  <svg
+    ref={ref}
+    viewBox="0 0 600 300"
+    preserveAspectRatio="xMidYMid meet"
+    style={{
+      width: '100%',
+      height: '100%',
+      display: 'block'
+    }}
+  />
+);
 }
+
+
 
 export default App;

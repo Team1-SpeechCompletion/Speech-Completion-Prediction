@@ -3,7 +3,7 @@ import './App.css';
 import * as d3 from 'd3';
 
 //const BACKEND_URL = 'http://127.0.0.1:5000';
-const BACKEND_URL = 'https://eb907b17cbb4.ngrok-free.app/';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
   const [text, setText] = useState('');
